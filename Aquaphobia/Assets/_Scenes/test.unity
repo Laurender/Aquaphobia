@@ -253,6 +253,7 @@ MonoBehaviour:
   waterPrefab: {fileID: 1275843143498606, guid: 5a1611804e9d3a34db3c9aef41110cae,
     type: 2}
   gridSize: 10
+  speed: 1
 --- !u!4 &890350553
 Transform:
   m_ObjectHideFlags: 0
@@ -260,7 +261,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 890350551}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -17, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
