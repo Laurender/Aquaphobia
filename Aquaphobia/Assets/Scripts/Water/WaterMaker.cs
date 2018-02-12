@@ -11,12 +11,12 @@ public class WaterMaker : MonoBehaviour {
 
     private void Awake()
     {
-        for (int x = -gridSize; x < gridSize; x++)
+        for (int x = -gridSize; x <= gridSize; x++)
         {
-            for (int z = -gridSize; z < gridSize; z++)
+            for (int z = -gridSize; z <= gridSize; z++)
             {
                 GameObject waterTile = Instantiate(waterPrefab, transform);
-                waterTile.transform.position = new Vector3(x * 10, transform.position.y, z * 10);
+                waterTile.transform.position = new Vector3(x * 30, transform.position.y, z * 30);
             }
         }
     }
