@@ -9,6 +9,9 @@ public class BoxDown : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
+        {
             transform.position = end.position;
+            transform.rotation = end.rotation;
+        }
     }
 }

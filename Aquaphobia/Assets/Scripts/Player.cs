@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Player : RaycastController {
+public class Player : MonoBehaviour{
+
+    [SerializeField]
+    private LayerMask collisionMask;
+    public Transform raycastOrigin;
 
     //MovementSpeed
     public float moveSpeed = 5;
@@ -49,24 +53,24 @@ public class Player : RaycastController {
         
 	}
 
-    public bool GetGrounded()
+    public bool IsGrounded()
     {
-        if (isGrounded)
-        {
-            return true;
-        }
-        if (Controller.isGrounded || 
-            Controller.collisionFlags == CollisionFlags.CollidedBelow || 
-            Controller.collisionFlags == CollisionFlags.Below)
-            return true;
-        else return false;
+        RaycastHit hit;
+        bool raycastBool = Physics.Raycast(raycastOrigin.position, Vector3.down, out hit, Controller.skinWidth*1.1f, collisionMask);
+
+
+        Debug.DrawRay(raycastOrigin.position, Vector3.down * 0.15f, Color.black);      
+        Debug.DrawLine(hit.point-Vector3.up*0.15f, hit.point+ Vector3.up*0.15f);
+        Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
+
+        return raycastBool;
     }
     
     void Update()
     {
         Vector3 input = Vector3.zero;
         input = MoveInput();
-        
+ 
         if (hitNormal != Vector3.zero) _slopeAngle = Vector3.Angle(Vector3.up, hitNormal);
         if (!Controller.isGrounded) hitNormal = Vector3.zero;
         input = HandleSlopes(input, _slopeAngle); //get movement input from method and send it to handleslopes method. man fuck this code
@@ -83,7 +87,7 @@ public class Player : RaycastController {
         moveInput = moveInput.normalized * moveSpeed;
         Vector3 _moveVelocity = new Vector3(0,moveInput.y,0);
 
-        if (GetGrounded())
+        if (IsGrounded())
             {
             moveVelocity.y = 0;
             if (Input.GetKeyDown(KeyCode.Space))
