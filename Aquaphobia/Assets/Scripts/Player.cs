@@ -6,7 +6,7 @@ using UnityEngine;
 public class Player : MonoBehaviour{
 
     [SerializeField]
-    private LayerMask collisionMask;
+    public LayerMask collisionMask;
     public Transform raycastOrigin;
 
     //MovementSpeed
@@ -20,16 +20,14 @@ public class Player : MonoBehaviour{
     [Tooltip("How long it takes to reach jump height")]
     private float timeToApex = 1f;
 
-    private float jumpTimer = 0.0f;
     Vector3 gravity;
-    [SerializeField]
-    public bool isGrounded = false;
 
     float storeY;
     private float _slideMultiplier = 1;
 
     public Vector3 moveVelocity;
 
+    private bool isJumping;
     private bool onSlope; // is on a slope or not
     private bool slidingSlope; // is on a slope thats too steep
     public float slideSpeed = 0.3f; // slope slide speed
@@ -37,8 +35,11 @@ public class Player : MonoBehaviour{
     private float _slopeAngle;
     private Vector3 hitNormal; //orientation of the slope.
 
+    private RaycastHit _hit;
+
 
     public CharacterController Controller { get; set; }
+    private RaycastController rayController;
 
     [SerializeField]
     private float _gravityScale;
@@ -47,37 +48,32 @@ public class Player : MonoBehaviour{
     {
         gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
         Controller = GetComponent<CharacterController>();
+        rayController = GetComponent<RaycastController>();
     }
 
     void Start () {
-        
+
 	}
 
     public bool IsGrounded()
     {
-        RaycastHit hit;
-        bool raycastBool = Physics.Raycast(raycastOrigin.position, Vector3.down, out hit, Controller.skinWidth*1.1f, collisionMask);
-
-
-        Debug.DrawRay(raycastOrigin.position, Vector3.down * 0.15f, Color.black);      
-        Debug.DrawLine(hit.point-Vector3.up*0.15f, hit.point+ Vector3.up*0.15f);
-        Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
-
-        return raycastBool;
+        //isGrounded = rayController.RaycastGridBool();        
+        return rayController.RaycastGridBool();
     }
     
     void Update()
     {
         Vector3 input = Vector3.zero;
         input = MoveInput();
- 
+        _hit = rayController.RaycastGridHit();
+        hitNormal = rayController.RaycastGridHit().normal;
         if (hitNormal != Vector3.zero) _slopeAngle = Vector3.Angle(Vector3.up, hitNormal);
-        if (!Controller.isGrounded) hitNormal = Vector3.zero;
-        input = HandleSlopes(input, _slopeAngle); //get movement input from method and send it to handleslopes method. man fuck this code
+        
+        input = HandleSlopes(input, _slopeAngle);
+        Jump();
 
-        storeY = transform.position.y;
-        moveVelocity += gravity * Time.deltaTime;// * _gravityScale;
-        Controller.Move((input + moveVelocity) * Time.deltaTime);
+        moveVelocity += gravity * Time.deltaTime * _gravityScale;
+        Controller.Move((input+moveVelocity)*Time.deltaTime);
     }
 
     public Vector3 MoveInput()
@@ -85,70 +81,89 @@ public class Player : MonoBehaviour{
         
         Vector3 moveInput = (transform.forward * Input.GetAxisRaw("Vertical")) + (transform.right * Input.GetAxisRaw("Horizontal"));
         moveInput = moveInput.normalized * moveSpeed;
+        if (Input.GetKey(KeyCode.LeftShift)) moveInput *= 0.5f;
         Vector3 _moveVelocity = new Vector3(0,moveInput.y,0);
 
+        if (!slidingSlope) _moveVelocity = moveInput;       
+        return _moveVelocity;
+    }
+
+    public void Jump()
+    {
         if (IsGrounded())
-            {
+        {
             moveVelocity.y = 0;
+            _gravityScale = 1;
+            isJumping = false;
+            hitNormal = Vector3.zero;
             if (Input.GetKeyDown(KeyCode.Space))
-                {
-                moveVelocity.y = jumpHeight;
+            {
+                isJumping = true;
                 hitNormal = Vector3.zero;
+                moveVelocity.y = jumpHeight;
                 Debug.Log("jump");
             }
         }
-        if (!slidingSlope) _moveVelocity = moveInput;
-        return _moveVelocity;
+        else
+        {
+            _gravityScale *= 1.01f;
+            hitNormal = Vector3.zero;
+        }
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        hitNormal = hit.normal;
     }
 
     private Vector3 HandleSlopes(Vector3 movement, float slopeAngle)
     {
-        onSlope = (Mathf.Abs(slopeAngle)>5f&&Controller.isGrounded);
+        Debug.DrawLine(_hit.point, _hit.point + _hit.normal * 2f, Color.red);
+        onSlope = (Mathf.Abs(slopeAngle)>5f && slopeAngle<89);
         slidingSlope = (slopeAngle >= slopeLimit);
+
+        Vector3 rayOrigin = transform.position + transform.forward * 0.55f;
+        Debug.DrawLine(rayOrigin, rayOrigin + Vector3.down * 1, Color.red);
 
         //Character on slopes
         if (onSlope) {
-            
             bool ascendSlope, descendSlope; //Determine if character is going up or down a slope.
-            if (storeY < transform.position.y)
+            if (Physics.Raycast(rayOrigin, Vector3.down, 1f, collisionMask))
             {
-                descendSlope = false; ascendSlope = true;
-            }
-            if(storeY > transform.position.y)
-            {
-                descendSlope = true; ascendSlope = true;
+                descendSlope = false;
+                ascendSlope = true;
+                Debug.Log("ascend");
             }
             else
             {
-                descendSlope = false; ascendSlope = false;
+                descendSlope = true;
+                ascendSlope = false;
+                Debug.Log("descend");
             }
+ 
             //Lose control on slopes too steep
             if (slidingSlope)
-            {
+            {               
                 movement.x += (1f - hitNormal.y) * hitNormal.x * slideSpeed * _slideMultiplier;
                 movement.z += (1f - hitNormal.y) * hitNormal.z * slideSpeed * _slideMultiplier;
+                float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
+                movement.y -= descend_moveAmountY;
                 _slideMultiplier *= 1.05f;
             }
-            //This works
-            if (descendSlope)
+            //Doesnt work
+            if (descendSlope && !slidingSlope)
             {
+                Debug.Log("pos: " + transform.position + " mov: " + movement);
                 float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
                 movement = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * new Vector3(movement.x, 0, movement.z);
                 movement.y -= descend_moveAmountY;
             }
-            //this doesn't
-            if (ascendSlope)
+            //Nothing works at all
+            if (ascendSlope && !slidingSlope)
             {
-                //float moveDistance = Mathf.Abs(Vector3.Distance(transform.position, movement));
-                //float climb_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+                float moveDistance = Mathf.Abs(Vector3.Distance(transform.position, movement));
+                float climb_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
 
-                //movement.y = climb_moveAmountY;
-                //_moveAmount.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+                movement.y = climb_moveAmountY;
             }
         }
         else
@@ -156,12 +171,11 @@ public class Player : MonoBehaviour{
             //Reset slidespeed multiplier
             _slideMultiplier = 1;
         }
-        
+        Debug.DrawLine(transform.position, transform.position + movement, Color.blue);
         return movement;
     }
     private void OnDrawGizmos()
     {
-        
     }
 
     /*   Vector3 Gravity

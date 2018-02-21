@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Player))]
-public class RaycastController : MonoBehaviour {
+public class RaycastController : MonoBehaviour{
 
-    [SerializeField]
-    public LayerMask collisionMask;
+    private LayerMask collisionMask;
 
     private float skinWidth = .015f;
-    private const float dstBetweenRays = .25f;
+    private const float dstBetweenRays = .25f; //How far the raycasts are from each other
     private int horizontalRayCount = 4;
     private int verticalRayCount = 4;
     private int verticalRayCount2 = 4;
@@ -18,8 +17,11 @@ public class RaycastController : MonoBehaviour {
     private float verticalRaySpacing;
     private float verticalRaySpacing2;
 
-    private Player player;
+    private float outerRingOffset = 0.15f; //How much higher is the outer ring compared to center
+    public Player player;
     public RaycastOrigins raycastOrigins;
+
+    private RaycastHit raycastHit;
 
 
     public struct RaycastOrigins
@@ -30,22 +32,33 @@ public class RaycastController : MonoBehaviour {
 
     public void Awake()
     {
-        if(player==null) player = GetComponent<Player>();
-        
+                   
     }
 
     void Start () {
-        skinWidth = player.Controller.skinWidth;
+        if (player == null) player = GetComponent<Player>();
+        skinWidth = player.Controller.skinWidth*1.2f;
+        collisionMask = player.collisionMask;
         CalculateRaySpacing();       
     }
+    private void SetRaycastHit(RaycastHit hit)
+    {
+        raycastHit = hit;
+    }
 
-    void Update()
+    public RaycastHit RaycastGridHit()
+    {
+        Debug.DrawLine(raycastHit.point, raycastHit.point + raycastHit.normal * 2f, Color.green);
+        return raycastHit;
+    }
+    public bool RaycastGridBool()
     {
         UpdateRaycastOrigins();
+        bool hitBool = false;
+        Vector3 direction = new Vector3(player.moveVelocity.x, 0, player.moveVelocity.z) * Time.deltaTime;
+        float directionY = Mathf.Sign(player.moveVelocity.y * Time.deltaTime);
+        float rayLength = Mathf.Abs(player.moveVelocity.y * Time.deltaTime) + skinWidth*2;
 
-        float directionY = Mathf.Sign(player.moveVelocity.y);
-        float rayLength = Mathf.Abs(player.moveVelocity.y) + skinWidth;
-        
 
         if (Mathf.Abs(player.moveVelocity.y) < 0.5f)
         {
@@ -56,29 +69,35 @@ public class RaycastController : MonoBehaviour {
         {
             for (int i = 0; i < verticalRayCount; i++)
             {
-                if (k > 0 && k < verticalRayCount-1 || i > 0 && i < verticalRayCount-1)
+                Vector3 offSetRing = new Vector3(0, 0, 0); 
+                if((i != (verticalRayCount - 1) / 2 || k != (verticalRayCount - 1) / 2))
                 {
-                    Vector3 rayOrigin = raycastOrigins.xyz + Vector3.forward * k * verticalRaySpacing2;
+                    offSetRing.y = outerRingOffset;
+                }
+                    directionY = Mathf.Sign(player.moveVelocity.y * Time.deltaTime);
+                    Vector3 rayOrigin = raycastOrigins.xyz + offSetRing + Vector3.forward * k * verticalRaySpacing + direction;
                     rayOrigin += Vector3.right * (verticalRaySpacing * i);
-                    RaycastHit2D hit = Physics2D.Raycast(rayOrigin, -Vector2.up, rayLength, collisionMask);
+                    RaycastHit hit;
+                    hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
 
-                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength * 3, Color.yellow);
+                    //Debug.DrawRay(rayOrigin, -player.transform.up * 1f, Color.yellow);
                     Debug.DrawRay(rayOrigin, -Vector2.up * rayLength, Color.black);
 
-                    Debug.Log(hit);
-                    if (hit)
+                    Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
+                    Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
+                    if (hitBool)
                     {
-                        rayLength = hit.distance;
+                    rayLength = hit.distance;                   
+                    SetRaycastHit(hit);                    
+                    return hitBool;
                     }
-
-                }
 
             }
         }
-
+        return hitBool;
     }
 
-        public void UpdateRaycastOrigins()
+    public void UpdateRaycastOrigins()
     {
         Bounds bounds = player.Controller.bounds;
         bounds.Expand(skinWidth * -2);
