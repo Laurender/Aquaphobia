@@ -8,7 +8,7 @@ public class RaycastController : MonoBehaviour{
     private LayerMask collisionMask;
 
     private float skinWidth = .015f;
-    private const float dstBetweenRays = .25f; //How far the raycasts are from each other
+    private const float dstBetweenRays = .15f; //How far the raycasts are from each other
     private int horizontalRayCount = 4;
     private int verticalRayCount = 4;
     private int verticalRayCount2 = 4;
@@ -55,12 +55,12 @@ public class RaycastController : MonoBehaviour{
     {
         UpdateRaycastOrigins();
         bool hitBool = false;
-        Vector3 direction = new Vector3(player.moveVelocity.x, 0, player.moveVelocity.z) * Time.deltaTime;
-        float directionY = Mathf.Sign(player.moveVelocity.y * Time.deltaTime);
-        float rayLength = Mathf.Abs(player.moveVelocity.y * Time.deltaTime) + skinWidth*2;
+        Vector3 velocity = player.Controller.velocity * Time.deltaTime;
+        Vector3 direction = new Vector3(velocity.x, 0, velocity.z);
+        float rayLength = Mathf.Abs(velocity.y) + skinWidth*2;
 
 
-        if (Mathf.Abs(player.moveVelocity.y) < 0.5f)
+        if (Mathf.Abs(player.Controller.velocity.y) < 0.5f)
         {
             rayLength = 2 * skinWidth;
         }
@@ -74,21 +74,22 @@ public class RaycastController : MonoBehaviour{
                 {
                     offSetRing.y = outerRingOffset;
                 }
-                    directionY = Mathf.Sign(player.moveVelocity.y * Time.deltaTime);
+                    float directionY = Mathf.Sign(player.moveVelocity.y);
                     Vector3 rayOrigin = raycastOrigins.xyz + offSetRing + Vector3.forward * k * verticalRaySpacing + direction;
                     rayOrigin += Vector3.right * (verticalRaySpacing * i);
                     RaycastHit hit;
                     hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
 
-                    //Debug.DrawRay(rayOrigin, -player.transform.up * 1f, Color.yellow);
-                    Debug.DrawRay(rayOrigin, -Vector2.up * rayLength, Color.black);
+                    Debug.DrawRay(rayOrigin, player.transform.up * directionY * 1f, Color.yellow);
+                    Debug.DrawRay(rayOrigin, -Vector2.up * directionY * rayLength, Color.black);
 
-                    Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
-                    Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
+                    
                     if (hitBool)
                     {
                     rayLength = hit.distance;                   
-                    SetRaycastHit(hit);                    
+                    SetRaycastHit(hit);
+                    Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
+                    Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
                     return hitBool;
                     }
 

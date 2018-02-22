@@ -20,12 +20,10 @@ public class Player : MonoBehaviour{
     [Tooltip("How long it takes to reach jump height")]
     private float timeToApex = 1f;
 
-    Vector3 gravity;
+    private Vector3 gravity;
 
     float storeY;
     private float _slideMultiplier = 1;
-
-    public Vector3 moveVelocity;
 
     private bool isJumping;
     private bool onSlope; // is on a slope or not
@@ -37,6 +35,7 @@ public class Player : MonoBehaviour{
 
     private RaycastHit _hit;
 
+    public Vector3 moveVelocity;
 
     public CharacterController Controller { get; set; }
     private RaycastController rayController;
@@ -57,14 +56,14 @@ public class Player : MonoBehaviour{
 
     public bool IsGrounded()
     {
-        //isGrounded = rayController.RaycastGridBool();        
+        //isGrounded = rayController.RaycastGridBool();  
         return rayController.RaycastGridBool();
     }
     
     void Update()
     {
         Vector3 input = Vector3.zero;
-        input = MoveInput();
+        input = MoveInput();       
         _hit = rayController.RaycastGridHit();
         hitNormal = rayController.RaycastGridHit().normal;
         if (hitNormal != Vector3.zero) _slopeAngle = Vector3.Angle(Vector3.up, hitNormal);
@@ -72,8 +71,9 @@ public class Player : MonoBehaviour{
         input = HandleSlopes(input, _slopeAngle);
         Jump();
 
+
         moveVelocity += gravity * Time.deltaTime * _gravityScale;
-        Controller.Move((input+moveVelocity)*Time.deltaTime);
+        Controller.Move((input+moveVelocity) * Time.deltaTime);
     }
 
     public Vector3 MoveInput()
@@ -84,7 +84,7 @@ public class Player : MonoBehaviour{
         if (Input.GetKey(KeyCode.LeftShift)) moveInput *= 0.5f;
         Vector3 _moveVelocity = new Vector3(0,moveInput.y,0);
 
-        if (!slidingSlope) _moveVelocity = moveInput;       
+        if (!slidingSlope) return _moveVelocity = moveInput;
         return _moveVelocity;
     }
 
@@ -95,18 +95,16 @@ public class Player : MonoBehaviour{
             moveVelocity.y = 0;
             _gravityScale = 1;
             isJumping = false;
-            hitNormal = Vector3.zero;
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                isJumping = true;
-                hitNormal = Vector3.zero;
+                isJumping = true;               
                 moveVelocity.y = jumpHeight;
-                Debug.Log("jump");
+                //Debug.Log("jump");
             }
         }
         else
         {
-            _gravityScale *= 1.01f;
+            //_gravityScale *= 1.01f;
             hitNormal = Vector3.zero;
         }
     }
@@ -117,47 +115,35 @@ public class Player : MonoBehaviour{
 
     private Vector3 HandleSlopes(Vector3 movement, float slopeAngle)
     {
-        Debug.DrawLine(_hit.point, _hit.point + _hit.normal * 2f, Color.red);
+        Vector2 isMoving = new Vector2(movement.x, movement.z);
         onSlope = (Mathf.Abs(slopeAngle)>5f && slopeAngle<89);
         slidingSlope = (slopeAngle >= slopeLimit);
 
         Vector3 rayOrigin = transform.position + transform.forward * 0.55f;
-        Debug.DrawLine(rayOrigin, rayOrigin + Vector3.down * 1, Color.red);
-
+  
         //Character on slopes
-        if (onSlope) {
+        if (onSlope && !isJumping && isMoving != Vector2.zero) {
             bool ascendSlope, descendSlope; //Determine if character is going up or down a slope.
             if (Physics.Raycast(rayOrigin, Vector3.down, 1f, collisionMask))
             {
                 descendSlope = false;
                 ascendSlope = true;
-                Debug.Log("ascend");
+                //Debug.Log("ascend");
             }
             else
             {
                 descendSlope = true;
                 ascendSlope = false;
-                Debug.Log("descend");
-            }
- 
-            //Lose control on slopes too steep
-            if (slidingSlope)
-            {               
-                movement.x += (1f - hitNormal.y) * hitNormal.x * slideSpeed * _slideMultiplier;
-                movement.z += (1f - hitNormal.y) * hitNormal.z * slideSpeed * _slideMultiplier;
-                float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
-                movement.y -= descend_moveAmountY;
-                _slideMultiplier *= 1.05f;
-            }
-            //Doesnt work
+                //Debug.Log("descend");
+            }           
+
             if (descendSlope && !slidingSlope)
-            {
-                Debug.Log("pos: " + transform.position + " mov: " + movement);
+            {                
                 float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
                 movement = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * new Vector3(movement.x, 0, movement.z);
                 movement.y -= descend_moveAmountY;
             }
-            //Nothing works at all
+
             if (ascendSlope && !slidingSlope)
             {
                 float moveDistance = Mathf.Abs(Vector3.Distance(transform.position, movement));
@@ -166,12 +152,23 @@ public class Player : MonoBehaviour{
                 movement.y = climb_moveAmountY;
             }
         }
+        //Lose control on slopes too steep
+        else if(slidingSlope)
+        {
+            Debug.Log("we here");
+            movement.x += (1f - hitNormal.y) * hitNormal.x * slideSpeed * _slideMultiplier;
+            movement.z += (1f - hitNormal.y) * hitNormal.z * slideSpeed * _slideMultiplier;
+
+            float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
+            movement.y -= descend_moveAmountY;
+            _slideMultiplier *= 1.03f;
+        }
         else
         {
             //Reset slidespeed multiplier
             _slideMultiplier = 1;
         }
-        Debug.DrawLine(transform.position, transform.position + movement, Color.blue);
+        //Debug.DrawLine(transform.position, transform.position + movement, Color.blue);
         return movement;
     }
     private void OnDrawGizmos()
