@@ -51,7 +51,6 @@ public class Player : MonoBehaviour{
     }
 
     void Start () {
-
 	}
 
     public bool IsGrounded()
