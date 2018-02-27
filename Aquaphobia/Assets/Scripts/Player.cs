@@ -46,6 +46,7 @@ public class Player : MonoBehaviour{
     void Awake()
     {
         gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
+        Debug.Log("Gravity: " + gravity.y);
         Controller = GetComponent<CharacterController>();
         rayController = GetComponent<RaycastController>();
     }
@@ -54,9 +55,8 @@ public class Player : MonoBehaviour{
 	}
 
     public bool IsGrounded()
-    {
-        //isGrounded = rayController.RaycastGridBool();  
-        return rayController.RaycastGridBool();
+    { 
+        return rayController.RaycastGrid();
     }
     
     void Update()
@@ -66,15 +66,44 @@ public class Player : MonoBehaviour{
         _hit = rayController.RaycastGridHit();
         hitNormal = rayController.RaycastGridHit().normal;
         if (hitNormal != Vector3.zero) _slopeAngle = Vector3.Angle(Vector3.up, hitNormal);
-        
+
         input = HandleSlopes(input, _slopeAngle);
         Jump();
-
 
         moveVelocity += gravity * Time.deltaTime * _gravityScale;
         Controller.Move((input+moveVelocity) * Time.deltaTime);
     }
 
+    private void OnDrawGizmos()
+    {
+        if(gravity == Vector3.zero)
+        {
+            gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
+        }
+        var curPos = transform.position;
+        var jump = jumpHeight;
+        var steps = 15;
+        RaycastHit hit;
+        bool b_hit = false;
+        for (int i = 0; i < steps*1.2f; i++)
+        {
+            var nextPos = curPos + transform.forward * moveSpeed / steps; //Forward movement
+            jump  += (gravity.y) / steps;
+            nextPos += new Vector3(0, jump/steps , 0);
+            Gizmos.color = (!b_hit) ? Color.blue: Color.gray;            
+            Gizmos.DrawLine(curPos, nextPos);            
+            if (Physics.Raycast(curPos, nextPos - curPos, out hit, Vector3.Distance(curPos, nextPos), collisionMask))
+            {
+                Gizmos.color = (!b_hit) ? Color.magenta : Color.gray;
+                Gizmos.DrawWireSphere(hit.point, 0.2f);
+                b_hit = true;
+            }
+            curPos = nextPos;
+        }
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(Vector3.zero, Vector3.forward * moveSpeed);
+    }
     public Vector3 MoveInput()
     {
         
@@ -154,7 +183,7 @@ public class Player : MonoBehaviour{
         //Lose control on slopes too steep
         else if(slidingSlope)
         {
-            Debug.Log("we here");
+            //Debug.Log("Sliding");
             movement.x += (1f - hitNormal.y) * hitNormal.x * slideSpeed * _slideMultiplier;
             movement.z += (1f - hitNormal.y) * hitNormal.z * slideSpeed * _slideMultiplier;
 
@@ -170,63 +199,5 @@ public class Player : MonoBehaviour{
         //Debug.DrawLine(transform.position, transform.position + movement, Color.blue);
         return movement;
     }
-    private void OnDrawGizmos()
-    {
-    }
-
-    /*   Vector3 Gravity
-   {
-
-       get
-       {
-
-           Ray ray = new Ray();
-           ray.origin = this.transform.position;
-           ray.direction = Vector3.down;
-
-           //On floor
-           if (Physics.Raycast(ray, this.controller.height * 0.55f))
-           {
-               isJumping = false;
-               //Jump
-               if (Input.GetKey(KeyCode.Space))
-               {
-                   jumpTimer = timeToApex;
-                   isJumping = true;
-               } 
-
-           }
-
-           //Jump time
-           if (jumpTimer > 0f)
-           {
-               isJumping = true;
-               float height = jumpCurve.Evaluate((timeToApex - jumpTimer) / timeToApex); //Percentage of elapsed jump
-               this.jumpTimer -= Time.deltaTime;
-               var _gravity = Vector3.up * (jumpCurve.Evaluate((timeToApex - jumpTimer) / timeToApex) - height) * jumpHeight;
-               return (_gravity);
-           }
-           else
-           {
-               isJumping = false;
-           }
-           return gravity * Time.deltaTime;
-
-       }
-
-   }
-   */
-
-    /*	void Update () {
-            storeY = transform.position.y;
-            //Get Player input from Horizontal/Vertical axes
-            Vector3 moveInput = (transform.forward * Input.GetAxisRaw("Vertical")) + (transform.right * Input.GetAxisRaw("Horizontal"));
-            moveInput = moveInput.normalized * moveSpeed;
-
-            var moveVelocity = (Gravity + moveInput * Time.deltaTime);
-            Debug.Log(moveVelocity.y);
-            controller.Move(moveVelocity);
-        }
-    */
-
+    
 }

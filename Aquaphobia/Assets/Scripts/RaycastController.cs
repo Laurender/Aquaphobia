@@ -8,18 +8,24 @@ public class RaycastController : MonoBehaviour{
     private LayerMask collisionMask;
 
     private float skinWidth = .015f;
-    private const float dstBetweenRays = .15f; //How far the raycasts are from each other
-    private int horizontalRayCount = 4;
+    private const float dstBetweenRays = .17f; //How far the raycasts are from each other
+    //private int horizontalRayCount = 4;
     private int verticalRayCount = 4;
-    private int verticalRayCount2 = 4;
 
-    private float horizontalRaySpacing;
+    //private float horizontalRaySpacing;
     private float verticalRaySpacing;
-    private float verticalRaySpacing2;
 
-    private float outerRingOffset = 0.15f; //How much higher is the outer ring compared to center
-    public Player player;
-    public RaycastOrigins raycastOrigins;
+    [SerializeField]
+    private float outerRingOffset = 0.2f; //How much higher is the outer ring compared to center
+
+    [SerializeField]
+    private Player player;
+
+
+    public Vector3 offSet;
+    public float radius = 0.5f;
+
+    private RaycastOrigins raycastOrigins;
 
     private RaycastHit raycastHit;
 
@@ -48,10 +54,10 @@ public class RaycastController : MonoBehaviour{
 
     public RaycastHit RaycastGridHit()
     {
-        Debug.DrawLine(raycastHit.point, raycastHit.point + raycastHit.normal * 2f, Color.green);
+        //Debug.DrawLine(raycastHit.point, raycastHit.point + raycastHit.normal * 2f, Color.green);
         return raycastHit;
     }
-    public bool RaycastGridBool()
+    public bool RaycastGrid()
     {
         UpdateRaycastOrigins();
         bool hitBool = false;
@@ -65,23 +71,31 @@ public class RaycastController : MonoBehaviour{
             rayLength = 2 * skinWidth;
         }
 
-        for (int k = 0; k < verticalRayCount2; k++)
+        for (int k = 0; k < verticalRayCount; k++)
         {
             for (int i = 0; i < verticalRayCount; i++)
             {
                 Vector3 offSetRing = new Vector3(0, 0, 0); 
-                if((i != (verticalRayCount - 1) / 2 || k != (verticalRayCount - 1) / 2))
+                if((i != (verticalRayCount - 1) / 2 || k != (verticalRayCount - 1) / 2 ))
                 {
                     offSetRing.y = outerRingOffset;
+                    rayLength = skinWidth * 2.5f;
+                    if ((i == 0) || (i == 4) || (k == 0) || (k == 4))
+                    {
+                        offSetRing.y = outerRingOffset * 2;
+                        rayLength = skinWidth * 3;
+                    }
                 }
+                
+
                     float directionY = Mathf.Sign(player.moveVelocity.y);
                     Vector3 rayOrigin = raycastOrigins.xyz + offSetRing + Vector3.forward * k * verticalRaySpacing + direction;
                     rayOrigin += Vector3.right * (verticalRaySpacing * i);
                     RaycastHit hit;
                     hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
 
-                    Debug.DrawRay(rayOrigin, player.transform.up * directionY * 1f, Color.yellow);
-                    Debug.DrawRay(rayOrigin, -Vector2.up * directionY * rayLength, Color.black);
+                    Debug.DrawRay(player.transform.position, player.transform.up * directionY * 1f, Color.yellow);
+                    Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.black);
 
                     
                     if (hitBool)
@@ -98,10 +112,34 @@ public class RaycastController : MonoBehaviour{
         return hitBool;
     }
 
+    /*public bool RaycastSphere()
+    {
+        RaycastHit hit;
+        bool hitBool = false;
+        Vector3 rayOrigin = player.transform.position - offSet;
+        Vector3 velocity = player.Controller.velocity * Time.deltaTime;
+        Vector3 direction = new Vector3(velocity.x, 0, velocity.z);
+
+        if(Physics.SphereCast(rayOrigin, radius, -player.transform.up, out hit))
+        {
+            SetRaycastHit(hit);
+            Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
+            Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
+            return hitBool;
+        }
+        return hitBool;
+    }
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(player.transform.position - offSet, radius);
+    }
+    */
+
     public void UpdateRaycastOrigins()
     {
-        Bounds bounds = player.Controller.bounds;
-        bounds.Expand(skinWidth * -2);
+        Bounds bounds = player.Controller.bounds;        
+        bounds.Expand(skinWidth * -1);
 
         raycastOrigins.xyz = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
         raycastOrigins.xyZ = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
@@ -114,18 +152,16 @@ public class RaycastController : MonoBehaviour{
     public void CalculateRaySpacing()
     {
         Bounds bounds = player.Controller.bounds;
-        bounds.Expand(skinWidth * -2);
+        bounds.Expand(skinWidth * -1);
 
         float boundsWidth = bounds.size.x;
-        float boundsLength = bounds.size.z;
-        float boundsHeigth = bounds.size.y;
+        //float boundsLength = bounds.size.z;
+        //float boundsHeigth = bounds.size.y;
 
-        horizontalRayCount = Mathf.RoundToInt(boundsHeigth / dstBetweenRays);
-        verticalRayCount = Mathf.RoundToInt(boundsWidth / dstBetweenRays);
-        verticalRayCount2 = Mathf.RoundToInt(boundsLength / dstBetweenRays);
+        //horizontalRayCount = Mathf.RoundToInt(boundsHeigth / dstBetweenRays);
+        verticalRayCount = Mathf.RoundToInt(boundsWidth / dstBetweenRays);        
 
-        horizontalRaySpacing = boundsHeigth / (horizontalRayCount - 1);
+        //horizontalRaySpacing = boundsHeigth / (horizontalRayCount - 1);
         verticalRaySpacing = boundsWidth / (verticalRayCount - 1);
-        verticalRaySpacing2 = boundsLength / (verticalRayCount2 - 1);
     }
 }
