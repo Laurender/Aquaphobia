@@ -112,7 +112,7 @@ public class Player : MonoBehaviour{
         if (Input.GetKey(KeyCode.LeftShift)) moveInput *= 0.5f;
         Vector3 _moveVelocity = new Vector3(0,moveInput.y,0);
 
-        if (!slidingSlope) return _moveVelocity = moveInput;
+        if (!slidingSlope) _moveVelocity = moveInput;
         return _moveVelocity;
     }
 
@@ -123,7 +123,7 @@ public class Player : MonoBehaviour{
             moveVelocity.y = 0;
             _gravityScale = 1;
             isJumping = false;
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) && !slidingSlope)
             {
                 isJumping = true;               
                 moveVelocity.y = jumpHeight;
@@ -189,7 +189,7 @@ public class Player : MonoBehaviour{
 
             float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
             movement.y -= descend_moveAmountY;
-            _slideMultiplier *= 1.03f;
+            _slideMultiplier *= 1.06f;
         }
         else
         {
