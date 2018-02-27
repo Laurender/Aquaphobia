@@ -1603,31 +1603,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 114994366926011452, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: outerRingOffset
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 143485705827808978, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: m_SlopeLimit
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 114994366926011452, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 1798143682}
-    - target: {fileID: 114994366926011452, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: offSet.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114994366926011452, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: radius
-      value: 0.7
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
   m_IsPrefabParent: 0
@@ -2760,12 +2735,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1798143682 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114990475331020736, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-    type: 2}
-  m_PrefabInternal: {fileID: 1125217211}
-  m_Script: {fileID: 11500000, guid: 32ea8ced08131a2429fe98ddfbdecdbb, type: 3}
 --- !u!1 &1829149872
 GameObject:
   m_ObjectHideFlags: 0
