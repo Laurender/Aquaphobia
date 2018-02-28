@@ -82,7 +82,7 @@ public class Player : MonoBehaviour{
         gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
         var curPos = transform.position + -Vector3.up;
         var jump = jumpHeight;
-        var steps = 15;
+        var steps = 60*timeToApex;
         var gravityScale = 1f;
         RaycastHit hit;
         bool b_hit = false;
@@ -103,7 +103,7 @@ public class Player : MonoBehaviour{
             }
             else
             {
-                if (i >= steps - 1 && steps<45)
+                if (i >= steps - 1 && steps<120*timeToApex)
                 {
                     steps++;
                 }
@@ -135,6 +135,7 @@ public class Player : MonoBehaviour{
                 isJumping = true;               
                 moveVelocity.y = jumpHeight;
                 //Debug.Log("jump");
+                
             }
         }
         else
@@ -198,7 +199,7 @@ public class Player : MonoBehaviour{
 
             float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
             movement.y -= descend_moveAmountY;
-            _slideMultiplier *= 1.02f;
+            _slideMultiplier *= 1.1f;
         }
         else
         {

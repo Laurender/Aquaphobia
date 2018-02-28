@@ -63,8 +63,8 @@ public class RaycastController : MonoBehaviour{
             for (int i = 0; i < verticalRayCount; i++)
             {
                 float directionY = Mathf.Sign(player.moveVelocity.y);
-                Vector3 rayOrigin = raycastOrigin + Vector3.forward * k * verticalRaySpacing + direction;
-                rayOrigin += Vector3.right * (verticalRaySpacing * i);
+                Vector3 rayOrigin = raycastOrigin + player.transform.forward * k * verticalRaySpacing + direction;
+                rayOrigin += player.transform.right * (verticalRaySpacing * i);
                 RaycastHit hit;
                 hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
 
@@ -90,25 +90,20 @@ public class RaycastController : MonoBehaviour{
     public void UpdateRaycastOrigins()
     {
         Bounds bounds = player.Controller.bounds;        
-        bounds.Expand(skinWidth * -0.1f);
-        float x, y, z;
-        x = player.transform.position.x - bounds.extents.x;
-        y = player.transform.position.y;
-        z = player.transform.position.z - bounds.extents.z;
+        bounds.Expand(skinWidth * -0.2f);
 
-        //raycastOrigins.xyz = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
-        raycastOrigin = new Vector3(x,y,z);
-        //raycastOrigins.xyZ = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+        Vector3 BackLeft = player.transform.position; //Calculate the point in the back left corner of player
+        BackLeft += -player.transform.right * bounds.extents.x;
+        BackLeft += -player.transform.forward * bounds.extents.z;
 
-        //raycastOrigins.Xyz = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
-        //raycastOrigins.XyZ = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+        raycastOrigin = BackLeft;
 
     }
 
     public void CalculateRaySpacing()
     {
         Bounds bounds = player.Controller.bounds;
-        bounds.Expand(skinWidth * -0.1f);
+        bounds.Expand(skinWidth * -0.2f);
 
         float boundsWidth = bounds.size.x;
         //float boundsLength = bounds.size.z;
