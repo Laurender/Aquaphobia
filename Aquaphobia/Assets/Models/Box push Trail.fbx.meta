@@ -1,19 +1,26 @@
 fileFormatVersion: 2
-guid: 948313f1a3169e841997d81b46ad3f65
-timeCreated: 1519307031
+guid: 7040c8452c03e45448c1249194978b31
+timeCreated: 1519817511
 licenseType: Free
 ModelImporter:
-  serializedVersion: 21
+  serializedVersion: 22
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Trail
+    4300000: 001 Trail boxpush
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: No Name
+    second: {fileID: 2100000, guid: 66a91bec139769749aed993543ee66cf, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -26,6 +33,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
