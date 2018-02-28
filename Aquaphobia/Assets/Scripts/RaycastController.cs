@@ -16,14 +16,7 @@ public class RaycastController : MonoBehaviour{
     private float verticalRaySpacing;
 
     [SerializeField]
-    private float outerRingOffset = 0.2f; //How much higher is the outer ring compared to center
-
-    [SerializeField]
     private Player player;
-
-
-    public Vector3 offSet;
-    public float radius = 0.5f;
 
     private RaycastHit raycastHit;
 
@@ -56,7 +49,8 @@ public class RaycastController : MonoBehaviour{
         bool hitBool = false;
         Vector3 velocity = player.Controller.velocity * Time.deltaTime;
         Vector3 direction = new Vector3(velocity.x, 0, velocity.z);
-        float rayLength = Mathf.Abs(velocity.y) + 1 + skinWidth;
+        float rayLength = Mathf.Abs(velocity.y) + 
+            1 + skinWidth;
 
 
         if (Mathf.Abs(player.Controller.velocity.y) < 0.5f)
@@ -74,12 +68,13 @@ public class RaycastController : MonoBehaviour{
                 RaycastHit hit;
                 hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
 
-                //Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.black);
+                Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.black);
 
                     
                 if (hitBool)
                 {
-                rayLength = hit.distance;                   
+                    
+                rayLength = hit.distance;
                 SetRaycastHit(hit);
                 Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
                 Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
@@ -91,34 +86,11 @@ public class RaycastController : MonoBehaviour{
         return hitBool;
     }
 
-    /*public bool RaycastSphere()
-    {
-        RaycastHit hit;
-        bool hitBool = false;
-        Vector3 rayOrigin = player.transform.position - offSet;
-        Vector3 velocity = player.Controller.velocity * Time.deltaTime;
-        Vector3 direction = new Vector3(velocity.x, 0, velocity.z);
-
-        if(Physics.SphereCast(rayOrigin, radius, -player.transform.up, out hit))
-        {
-            SetRaycastHit(hit);
-            Debug.DrawLine(hit.point - Vector3.up * 0.15f, hit.point + Vector3.up * 0.15f);
-            Debug.DrawLine(hit.point - Vector3.right * 0.15f, hit.point + Vector3.right * 0.15f);
-            return hitBool;
-        }
-        return hitBool;
-    }
-    public void OnDrawGizmos()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(player.transform.position - offSet, radius);
-    }
-    */
 
     public void UpdateRaycastOrigins()
     {
         Bounds bounds = player.Controller.bounds;        
-        bounds.Expand(skinWidth * -1);
+        bounds.Expand(skinWidth * -0.1f);
         float x, y, z;
         x = player.transform.position.x - bounds.extents.x;
         y = player.transform.position.y;
@@ -136,7 +108,7 @@ public class RaycastController : MonoBehaviour{
     public void CalculateRaySpacing()
     {
         Bounds bounds = player.Controller.bounds;
-        bounds.Expand(skinWidth * -1);
+        bounds.Expand(skinWidth * -0.1f);
 
         float boundsWidth = bounds.size.x;
         //float boundsLength = bounds.size.z;

@@ -278,12 +278,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collisionMask:
     serializedVersion: 2
-    m_Bits: 512
-  raycastOrigin: {fileID: 0}
+    m_Bits: 513
   moveSpeed: 5
   jumpHeight: 10
   timeToApex: 1
-  slideSpeed: 3
+  _gravityMultiplier: 1.03
+  slideSpeed: 5
   slopeLimit: 50
   moveVelocity: {x: 0, y: 0, z: 0}
   _gravityScale: 1
@@ -298,10 +298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dc71a7c5f9a0574cb586ef87a855716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outerRingOffset: 0.2
   player: {fileID: 114990475331020736}
-  offSet: {x: 0, y: 0.5, z: 0}
-  radius: 0.7
 --- !u!136 &136884389698761194
 CapsuleCollider:
   m_ObjectHideFlags: 1

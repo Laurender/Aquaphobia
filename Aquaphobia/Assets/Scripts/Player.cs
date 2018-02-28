@@ -7,10 +7,10 @@ public class Player : MonoBehaviour{
 
     [SerializeField]
     public LayerMask collisionMask;
-    public Transform raycastOrigin;
 
     //MovementSpeed
-    public float moveSpeed = 5;
+    [SerializeField]
+    private float moveSpeed = 5;
 
     //Jumping stats
     [SerializeField]
@@ -24,6 +24,8 @@ public class Player : MonoBehaviour{
 
     float storeY;
     private float _slideMultiplier = 1;
+    [SerializeField][Range(1, 2f)][Tooltip("How much gravity increases per midair frame")]
+    private float _gravityMultiplier = 1.02f;
 
     private bool isJumping;
     private bool onSlope; // is on a slope or not
@@ -76,19 +78,20 @@ public class Player : MonoBehaviour{
 
     private void OnDrawGizmos()
     {
-        if(gravity == Vector3.zero)
-        {
-            gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
-        }
-        var curPos = transform.position;
+
+        gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
+        var curPos = transform.position + -Vector3.up;
         var jump = jumpHeight;
         var steps = 15;
+        var gravityScale = 1f;
         RaycastHit hit;
         bool b_hit = false;
-        for (int i = 0; i < steps*1.2f; i++)
+        for (int i = 0; i < steps; i++)
         {
             var nextPos = curPos + transform.forward * moveSpeed / steps; //Forward movement
-            jump  += (gravity.y) / steps;
+            
+            jump  += (gravity.y ) / steps * gravityScale;
+            if(Mathf.Sign(jump)==-1) gravityScale *= _gravityMultiplier;
             nextPos += new Vector3(0, jump/steps , 0);
             Gizmos.color = (!b_hit) ? Color.blue: Color.gray;            
             Gizmos.DrawLine(curPos, nextPos);            
@@ -98,11 +101,15 @@ public class Player : MonoBehaviour{
                 Gizmos.DrawWireSphere(hit.point, 0.2f);
                 b_hit = true;
             }
+            else
+            {
+                if (i >= steps - 1 && steps<45)
+                {
+                    steps++;
+                }
+            }
             curPos = nextPos;
         }
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(Vector3.zero, Vector3.forward * moveSpeed);
     }
     public Vector3 MoveInput()
     {
@@ -123,7 +130,7 @@ public class Player : MonoBehaviour{
             moveVelocity.y = 0;
             _gravityScale = 1;
             isJumping = false;
-            if (Input.GetKeyDown(KeyCode.Space) && !slidingSlope)
+            if (Input.GetButtonDown("Jump") && !slidingSlope)
             {
                 isJumping = true;               
                 moveVelocity.y = jumpHeight;
@@ -132,7 +139,7 @@ public class Player : MonoBehaviour{
         }
         else
         {
-            //_gravityScale *= 1.01f;
+            if(Mathf.Sign(moveVelocity.y)==-1) _gravityScale *= _gravityMultiplier;
             hitNormal = Vector3.zero;
         }
     }
@@ -172,31 +179,33 @@ public class Player : MonoBehaviour{
                 movement.y -= descend_moveAmountY;
             }
 
-            if (ascendSlope && !slidingSlope)
+            /* //paska ei toimi          
+            if (ascendSlope && !slidingSlope) 
             {
                 float moveDistance = Mathf.Abs(Vector3.Distance(transform.position, movement));
                 float climb_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
 
                 movement.y = climb_moveAmountY;
             }
+            */
         }
         //Lose control on slopes too steep
-        else if(slidingSlope)
+        else if(slidingSlope&&Mathf.Sign(hitNormal.y)!=-1)
         {
-            //Debug.Log("Sliding");
+            Debug.Log("Sliding");
             movement.x += (1f - hitNormal.y) * hitNormal.x * slideSpeed * _slideMultiplier;
             movement.z += (1f - hitNormal.y) * hitNormal.z * slideSpeed * _slideMultiplier;
 
             float descend_moveAmountY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Vector3.Distance(transform.position, movement);
             movement.y -= descend_moveAmountY;
-            _slideMultiplier *= 1.06f;
+            _slideMultiplier *= 1.02f;
         }
         else
         {
             //Reset slidespeed multiplier
             _slideMultiplier = 1;
         }
-        //Debug.DrawLine(transform.position, transform.position + movement, Color.blue);
+        //Debug.DrawLine(transform.position, transform.position + movement, Color.cyan);
         return movement;
     }
     
