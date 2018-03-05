@@ -95,7 +95,7 @@ public class Player : MonoBehaviour{
             nextPos += new Vector3(0, jump/steps , 0);
             Gizmos.color = (!b_hit) ? Color.blue: Color.gray;            
             Gizmos.DrawLine(curPos, nextPos);            
-            if (Physics.Raycast(curPos, nextPos - curPos, out hit, Vector3.Distance(curPos, nextPos), collisionMask))
+            if (Physics.Raycast(curPos, nextPos - curPos, out hit, Vector3.Distance(curPos, nextPos), collisionMask, QueryTriggerInteraction.Ignore))
             {
                 Gizmos.color = (!b_hit) ? Color.magenta : Color.gray;
                 Gizmos.DrawWireSphere(hit.point, 0.2f);

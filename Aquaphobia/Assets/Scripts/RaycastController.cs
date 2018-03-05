@@ -66,12 +66,12 @@ public class RaycastController : MonoBehaviour{
                 Vector3 rayOrigin = raycastOrigin + Vector3.forward * k * verticalRaySpacing + direction;
                 rayOrigin += Vector3.right * (verticalRaySpacing * i);
                 RaycastHit hit;
-                hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask);
+                hitBool = Physics.Raycast(rayOrigin, player.transform.up * directionY, out hit, rayLength, collisionMask, QueryTriggerInteraction.Ignore);
 
                 Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.black);
 
                     
-                if (hitBool)
+                if (hitBool)    // hit.collider.isTrigger did not work here
                 {
                     
                 rayLength = hit.distance;

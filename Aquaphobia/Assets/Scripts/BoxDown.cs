@@ -2,24 +2,51 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoxDown : MonoBehaviour {
+public class BoxDown : Curve {
 
-    public Transform end;
-    float slerpTime;
-    float slerpAcceleration;
-    bool slerp = false;
+    private float lerpTime;
+    private float lerpFactor = 0f;
+    private bool lerp = false;
+
+    private void OnDrawGizmos()
+    {
+        float t = 0;
+        Vector3 startPoint = 
+            MathHelp.GetCurvePosition(start.position, middle.position, end.position, t);
+        Vector3 endPoint;
+
+        while (t < 1)
+        {
+            t += 0.015625f; // 1 divided by 64
+            endPoint =
+                MathHelp.GetCurvePosition(start.position, middle.position, end.position, t);
+
+            Debug.DrawLine(startPoint, endPoint, Color.black);
+
+            startPoint = endPoint;
+        }
+    }
 
     private void Update()
     {
-        if (slerp)
+        if (!lerp)
         {
-            transform.position = Vector3.Slerp(transform.position, end.position, slerpTime);
-            transform.rotation = Quaternion.Slerp(transform.rotation, end.rotation, slerpTime);
+            return;
         }
 
-        if (slerpTime >= 1 && slerp)
+        if (lerp)
         {
-            slerp = false;
+            lerpFactor++;
+            lerpTime += Time.deltaTime * lerpFactor * 0.125f;
+            transform.position =
+                MathHelp.GetCurvePosition(start.position, middle.position, end.position, lerpTime);
+            transform.rotation =
+                MathHelp.GetCurveRotation(start.rotation, middle.rotation, end.rotation, lerpTime);
+        }
+
+        if (lerpTime >= 1 && lerp)
+        {
+            lerp = false;
             transform.position = end.position;
             transform.rotation = end.rotation;
         }
@@ -27,11 +54,14 @@ public class BoxDown : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
+        if (lerp)
+        {
+            return;
+        }
+
         if (other.gameObject.tag == "Player")
         {
-            slerp = true;
-            slerpAcceleration += Time.fixedDeltaTime;
-            slerpTime += slerpAcceleration;
+            lerp = true;
         }
     }
 }
