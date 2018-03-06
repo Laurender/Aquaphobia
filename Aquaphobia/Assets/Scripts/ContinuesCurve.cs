@@ -7,8 +7,8 @@ public class ContinuesCurve : MonoBehaviour {
     public bool initDone = false;
     public Transform[] curvePoints;
     public float angleTolerance = 1;
-    public float minVelocity;
-    public float maxVelocity;
+    [Range(0f, 1f)]
+    public float maxVelocity = 0;
 
     public GameObject go;
     private float totalTime;
@@ -27,8 +27,6 @@ public class ContinuesCurve : MonoBehaviour {
         {
             // draw curve
             {
-                color = Color.black;
-
                 Vector3 start = curvePoints[i].position;
                 float t = 0f;
 
@@ -43,7 +41,8 @@ public class ContinuesCurve : MonoBehaviour {
                         t);
 
                     float velocity = Vector3.Distance(start, end);
-                    float grey = (velocity - minVelocity) / maxVelocity;
+                    float grayShade = Mathf.Clamp01(velocity / maxVelocity);
+                    color = new Color(grayShade, grayShade, grayShade);
 
                     Debug.DrawLine(start, end, color);
 
