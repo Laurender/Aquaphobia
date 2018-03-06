@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class ContinuesCurve : MonoBehaviour {
 
+    public bool initDone = false;
     public Transform[] curvePoints;
     public float angleTolerance = 1;
+    [Range(0f, 1f)]
+    public float maxVelocity = 0;
 
-    private bool initDone = false;
+    public GameObject go;
+    private float totalTime;
+    private float time;
     
     private void OnDrawGizmos()
     {
@@ -22,8 +27,6 @@ public class ContinuesCurve : MonoBehaviour {
         {
             // draw curve
             {
-                color = Color.black;
-
                 Vector3 start = curvePoints[i].position;
                 float t = 0f;
 
@@ -37,13 +40,20 @@ public class ContinuesCurve : MonoBehaviour {
                         curvePoints[i + 2].position,
                         t);
 
+                    float velocity = Vector3.Distance(start, end);
+                    float grayShade = Mathf.Clamp01(velocity / maxVelocity);
+                    color = new Color(grayShade, grayShade, grayShade);
+
                     Debug.DrawLine(start, end, color);
 
                     start = end;
                 }
             }
+        }
 
-            // draw straight lines
+        for (int i = 0; i < curvePoints.Length; i += 2)
+        {
+            // draw straight line
             {
                 if (i == 0)
                 {   // first line no angle check needed
@@ -78,6 +88,30 @@ public class ContinuesCurve : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void Update()
+    {
+        totalTime += Time.deltaTime * 0.5f;
+        // skip evens
+        if ((int)totalTime % 2 == 1)
+        {
+            totalTime++;
+        }
+        // reset
+        if (totalTime > curvePoints.Length - 2)
+        {
+            totalTime = 0f;
+        }
+
+        int index = (int)totalTime;
+        time = totalTime - index;
+
+        go.transform.position = MathHelp.GetCurvePosition(
+            curvePoints[index].position,
+            curvePoints[index + 1].position,
+            curvePoints[index + 2].position,
+            time);
     }
 
     private void InitCurvePoints()
