@@ -81,8 +81,7 @@ public class RaycastController : MonoBehaviour{
         bool upHitBool = false;
         Vector3 velocity = player.Controller.velocity * Time.deltaTime;
         Vector3 direction = new Vector3(velocity.x, velocity.y, velocity.z);
-        float rayLength = //Mathf.Abs(velocity.y) + 
-            1 + skinWidth;
+        float rayLength = 1 + skinWidth;
 
         Debug.Log(CurrentState);
 
@@ -96,7 +95,7 @@ public class RaycastController : MonoBehaviour{
         {
             for (int i = 0; i < verticalRayCount; i++)
             {
-                float directionY = (player.Controller.velocity.y>0)? 1 : -1;
+                //float directionY = (player.Controller.velocity.y>0)? 1 : -1;
                 
                 Vector3 rayOrigin = raycastOrigin + player.transform.forward * k * verticalRaySpacing + direction;
                 rayOrigin += player.transform.right * (verticalRaySpacing * i);
@@ -109,7 +108,7 @@ public class RaycastController : MonoBehaviour{
                 Debug.DrawRay(rayOrigin, -Vector2.up * rayLength, Color.grey);
 
 
-                if (downHitBool)    // hit.collider.isTrigger did not work here
+                if (downHitBool)    // Raycasts downward
                 {                   
                     rayLength = downHit.distance;
                     SetRaycastHit(downHit);
@@ -120,7 +119,7 @@ public class RaycastController : MonoBehaviour{
                     IsGrounded = downHitBool;
                     return;
                 }
-                else if (upHitBool)
+                else if (upHitBool) //Raycasts upward
                 {
                     rayLength = upHit.distance;
                     SetRaycastHit(upHit);

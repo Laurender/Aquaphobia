@@ -12,6 +12,8 @@ public class Player : MonoBehaviour{
     [SerializeField]
     private MovementType currentType;
 
+    private float typeChangeTimer = 0f;
+
 
     //MovementSpeed
     [SerializeField]
@@ -34,8 +36,6 @@ public class Player : MonoBehaviour{
     protected float slideSpeed = 0.3f; // slope slide speed
     [SerializeField]
     protected float slopeLimit = 50; //Slope limit
-
-    BasicMovement classic;
 
     protected RaycastHit _hit;
 
@@ -65,14 +65,26 @@ public class Player : MonoBehaviour{
     
     void Update()
     {
+        if (typeChangeTimer > 0)
+        {
+            Debug.Log(typeChangeTimer);
+            typeChangeTimer += -Time.deltaTime;            
+        }
+        else
+        {
+            typeChangeTimer = 0;
+        }
+
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (currentType == MovementType.Basic)
-            {               
+            if (currentType == MovementType.Basic && typeChangeTimer <= 0)
+            {
+                typeChangeTimer = 0.5f;
                 currentType = MovementType.Hangable;
             }
-            else if (currentType == MovementType.Hangable)
+            else if (currentType == MovementType.Hangable && typeChangeTimer <= 0)
             {
+                typeChangeTimer = 0.5f;
                 currentType = MovementType.Basic;
             }
             Debug.Log("MovementType Changed. New type: "+currentType);
@@ -153,6 +165,7 @@ public class Player : MonoBehaviour{
             if (Input.GetButtonDown("Jump"))
             {
                 Debug.Log("Changed to hanging");
+                typeChangeTimer = 0.5f;
                 currentType = MovementType.Hangable;
             }
         }
@@ -231,9 +244,10 @@ public class Player : MonoBehaviour{
         _hit = rayController.RaycastGridHit();
         hitNormal = rayController.RaycastGridHit().normal;
 
-        if (rayController.CurrentState == RaycastController.State.Moving)
+        if (rayController.CurrentState == RaycastController.State.Moving || (Input.GetButtonDown("Jump") && typeChangeTimer <= 0))
         {
             Debug.Log("Changed to Babsic");
+            typeChangeTimer = 0.5f;
             currentType = MovementType.Basic;
             moveVelocity.y = -0.8f;
         }

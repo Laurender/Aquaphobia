@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44658035, g: 0.49641353, b: 0.5748181, a: 1}
+  m_IndirectSpecularColor: {r: 0.446581, g: 0.4964143, b: 0.5748189, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1804,23 +1804,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 482234870}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &489520874 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1653006267605282, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-    type: 2}
-  m_PrefabInternal: {fileID: 1428376635}
---- !u!114 &489520875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 489520874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9db71d3d703a2244a73d4f9b055a6f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resetHeight: -10
 --- !u!4 &489520881 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
@@ -4995,63 +4978,39 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -0.99
+      value: -67.97368
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.7
+      value: 1.44
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -0.45
+      value: 26.643612
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.91649747
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.40004066
       objectReference: {fileID: 0}
     - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114994366926011452, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 1428376637}
-    - target: {fileID: 4249772176381190, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114990475331020736, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-        type: 2}
-      propertyPath: collisionMask.m_Bits
-      value: 513
-      objectReference: {fileID: 0}
-    - target: {fileID: 1653006267605282, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &1428376637 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114990475331020736, guid: 2cc0e1013bdd8ee4f8ed0a3c67aaf3e0,
-    type: 2}
-  m_PrefabInternal: {fileID: 1428376635}
-  m_Script: {fileID: 11500000, guid: 32ea8ced08131a2429fe98ddfbdecdbb, type: 3}
 --- !u!1 &1441302520
 GameObject:
   m_ObjectHideFlags: 0
@@ -5317,7 +5276,7 @@ GameObject:
   - component: {fileID: 1514981847}
   m_Layer: 10
   m_Name: climable roof
-  m_TagString: Untagged
+  m_TagString: Hangable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5329,7 +5288,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1514981845}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2, y: 5, z: 0}
+  m_LocalPosition: {x: -2, y: 4.5, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 1584498081}
