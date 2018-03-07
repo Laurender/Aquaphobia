@@ -95,7 +95,17 @@ public class RaycastController : MonoBehaviour{
         {
             for (int i = 0; i < verticalRayCount; i++)
             {
-                //float directionY = (player.Controller.velocity.y>0)? 1 : -1;
+                if( (k==0 && i == 0) ||
+                    (k==0 && i == verticalRayCount-1)||
+                    (i==0 && k == verticalRayCount-1)||
+                    (i== verticalRayCount - 1 && k== verticalRayCount - 1))
+                {
+                    continue;
+                }
+                {
+
+                }
+                float directionY = (player.Controller.velocity.y>0)? 1 : -1;
                 
                 Vector3 rayOrigin = raycastOrigin + player.transform.forward * k * verticalRaySpacing + direction;
                 rayOrigin += player.transform.right * (verticalRaySpacing * i);
@@ -154,7 +164,7 @@ public class RaycastController : MonoBehaviour{
     public void UpdateRaycastOrigins()
     {
         Bounds bounds = player.Controller.bounds;        
-        bounds.Expand(skinWidth * -0.2f);
+        bounds.Expand(skinWidth * -0.3f);
 
         Vector3 BackLeft = player.transform.position; //Calculate the point in the back left corner of player
         BackLeft += -player.transform.right * bounds.extents.x;
@@ -167,7 +177,7 @@ public class RaycastController : MonoBehaviour{
     public void CalculateRaySpacing()
     {
         Bounds bounds = player.Controller.bounds;
-        bounds.Expand(skinWidth * -0.2f);
+        bounds.Expand(skinWidth * -0.3f);
 
         float boundsWidth = bounds.size.x;
 
