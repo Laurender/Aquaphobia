@@ -6,12 +6,14 @@ public class CheckpointHandler : MonoBehaviour {
 
     private Checkpoint[] _checkpoints;
     private Checkpoint _activeCheckpoint;
+    private BoxDown[] _boxDowns;
 
     public float resetHeight;
 
-    private void Awake()
+    private void Start()
     {
         _checkpoints = FindObjectsOfType<Checkpoint>();
+        _boxDowns = FindObjectsOfType<BoxDown>();
     }
 
     private void Update()
@@ -20,6 +22,11 @@ public class CheckpointHandler : MonoBehaviour {
         {
             transform.position = _activeCheckpoint.checkpointPosition;
             transform.rotation = _activeCheckpoint.checkpointRotation;
+
+            foreach (BoxDown boxDown in _boxDowns)
+            {
+                boxDown.BoxReset();
+            }
         }
     }
 

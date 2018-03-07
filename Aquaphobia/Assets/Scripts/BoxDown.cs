@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class BoxDown : Curve {
 
-    private float lerpTime;
+    private float lerpTime = 0f;
     private float lerpFactor = 0f;
     private bool lerp = false;
+
+    private Vector3 resetPos;
+    private Quaternion resetRot;
+
+    private void Awake()
+    {
+        resetPos = transform.position;
+        resetRot = transform.rotation;
+    }
 
     private void OnDrawGizmos()
     {
@@ -50,6 +59,16 @@ public class BoxDown : Curve {
             transform.position = end.position;
             transform.rotation = end.rotation;
         }
+    }
+
+    public void BoxReset()
+    {
+        lerp = false;
+        lerpFactor = 0f;
+        lerpTime = 0f;
+
+        transform.position = resetPos;
+        transform.rotation = resetRot;
     }
 
     private void OnTriggerStay(Collider other)
