@@ -123,7 +123,7 @@ public class Player : MonoBehaviour{
         input = Basic_HandleSlopes(input, _slopeAngle);
         
 
-        if(!IsGrounded())moveVelocity += gravity * Time.deltaTime * _gravityScale;
+        moveVelocity += gravity * Time.deltaTime * _gravityScale;
         Controller.Move((input + moveVelocity) * Time.deltaTime);
     }
 
@@ -270,7 +270,7 @@ public class Player : MonoBehaviour{
     {
 
         gravity.y = -(2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
-        var curPos = transform.position + -Vector3.up;
+        var curPos = transform.position + -Vector3.up + transform.forward/2;
         var jump = jumpHeight;
         var steps = 60*timeToApex;
         var gravityScale = 1f;
